@@ -1,0 +1,84 @@
+{
+  // Cmd+Shift+B runs "Build a design". The build tasks list every design in
+  // builds/ in the terminal: type its number. Leave the player blank when
+  // only one person is online.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build a design",
+      "type": "shell",
+      "command": ".vscode/build.sh ${input:server} -- ${input:player} ${input:placement}",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build a design (dry run)",
+      "type": "shell",
+      "command": ".vscode/build.sh ${input:server} -- ${input:player} ${input:placement} --dry-run",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build a design at coordinates",
+      "type": "shell",
+      "command": ".vscode/build.sh ${input:server} -- --at ${input:at}",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Undo last build",
+      "type": "shell",
+      "command": "./mc ${input:server} undo",
+      "problemMatcher": []
+    },
+    {
+      "label": "List builds",
+      "type": "shell",
+      "command": "./mc ${input:server} builds",
+      "problemMatcher": []
+    },
+    {
+      "label": "Where is everyone",
+      "type": "shell",
+      "command": "./mc ${input:server} where",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "server",
+      "type": "pickString",
+      "description": "Which server?",
+      "options": [
+        { "label": "Home", "value": "" },
+        { "label": "Cloud", "value": "--cloud" }
+      ],
+      "default": ""
+    },
+    {
+      "id": "player",
+      "type": "promptString",
+      "description": "Player to build in front of (blank if only one is online)",
+      "default": ""
+    },
+    {
+      "id": "placement",
+      "type": "pickString",
+      "description": "Where to put it?",
+      "options": [
+        { "label": "3 blocks ahead (default)", "value": "" },
+        { "label": "Around the player (uses the design's AROUND)", "value": "--around" },
+        { "label": "6 blocks ahead", "value": "--distance 6" },
+        { "label": "10 blocks ahead", "value": "--distance 10" },
+        { "label": "20 blocks ahead", "value": "--distance 20" },
+        { "label": "3 ahead, raised 5", "value": "--up 5" }
+      ],
+      "default": ""
+    },
+    {
+      "id": "at",
+      "type": "promptString",
+      "description": "Origin block and facing: X,Y,Z,FACING (e.g. 6,76,-68,south)"
+    }
+  ]
+}
