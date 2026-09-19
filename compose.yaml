@@ -1,0 +1,64 @@
+services:
+  bedrock:
+    image: itzg/minecraft-bedrock-server
+    container_name: minecraft-bedrock
+    restart: unless-stopped
+
+    # The Bedrock binary is x86_64 only; on Apple Silicon this image emulates
+    # it with box64. Don't set `platform: linux/amd64` to get Rosetta instead:
+    # it runs, but the image's `send-command` finds the server by its
+    # /proc/<pid>/exe symlink, which under Rosetta points at /run/rosetta and
+    # matches nothing — so console commands and backups silently break.
+
+    # Bedrock has no RCON. These let you run `docker attach minecraft-bedrock`
+    # to get the server console (detach with ctrl-p ctrl-q, NOT ctrl-c).
+    stdin_open: true
+    tty: true
+
+    # `send-command` (used by ./mc cmd and live backups) finds the server via
+    # /proc/<pid>/exe. The server drops privileges at start, and reading that
+    # link on such a process needs SYS_PTRACE on a stock Linux Docker host.
+    # (Docker Desktop happens to allow it without.) Scoped to this container.
+    cap_add:
+      - SYS_PTRACE
+
+    # NetherNet: players open a TCP handshake on 19132, then the server hands
+    # each of them a UDP port from 19140-19159 for gameplay.
+    ports:
+      - "19132:19132/tcp"
+      - "19140-19159:19140-19159/udp"
+
+    volumes:
+      - ./data:/data
+      # The server's identity. Without a saved key it makes a new one on every
+      # start and players must re-accept "server trust" each time. The same key
+      # is used at home and in the cloud, so moving a world doesn't reset it.
+      - ./keys:/data/keys:ro
+
+    # Gameplay defaults, then your settings from `./mc setup`, then the
+    # active world's overrides. Later files win.
+    env_file:
+      - path: worlds/defaults.env
+      - path: config.env
+      - path: worlds/${WORLD:?set WORLD in .env}.env
+        required: false
+
+    # Fixed settings. These beat anything in the env files above.
+    environment:
+      EULA: "TRUE"
+      LEVEL_NAME: ${WORLD}
+
+      # Current clients only join over NetherNet (the server logs a TRANSPORT
+      # TYPE ERROR under raknet). The server sits behind Docker's NAT, so it
+      # must advertise the address players actually reach: PUBLIC_IP in .env.
+      TRANSPORT: nethernet
+      SERVER_UDP_PORTS: ${PUBLIC_IP:?set PUBLIC_IP in .env}:19140-19159:19140-19159
+      ENABLE_LAN_VISIBILITY: "true"
+
+    # mc-monitor only speaks raknet, so just check the handshake port is open.
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/19132"]
+      interval: 30s
+      timeout: 10s
+      start_period: 3m
+      retries: 3

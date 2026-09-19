@@ -1,0 +1,8 @@
+# Layered on compose.yaml on the cloud server (via COMPOSE_FILE in its .env).
+# A public server must verify Xbox sign-ins and only admit the allowlist;
+# with online mode off, anyone could join by typing an allowlisted gamertag.
+services:
+  bedrock:
+    environment:
+      ONLINE_MODE: "true"
+      WHITE_LIST: "true"

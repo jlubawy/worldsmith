@@ -1,0 +1,10 @@
+name: minecraft
+description: AWS Lightsail host for the Bedrock server
+runtime:
+  name: nodejs
+  options:
+    packagemanager: npm
+# State for this project only, kept on this machine, so it doesn't mix with
+# whatever your global `pulumi login` points at.
+backend:
+  url: file://~/.pulumi-minecraft
