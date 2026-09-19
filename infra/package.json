@@ -1,0 +1,16 @@
+{
+  "name": "worldsmith-infra",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@pulumi/aws": "^7",
+    "@pulumi/pulumi": "^3"
+  }
+}

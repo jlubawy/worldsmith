@@ -1,0 +1,17 @@
+.env
+config.env
+infra/Pulumi.*.yaml
+# Per-world settings are yours; the defaults and the sample are shared.
+worlds/*.env
+!worlds/defaults.env
+.cloud-host
+keys/
+data/
+backups/
+infra/node_modules/
+infra/bin/
+*.mcworld
+*.mcpack
+*.mcaddon
+.DS_Store
+__pycache__/
