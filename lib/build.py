@@ -327,11 +327,14 @@ def main(argv: list[str]) -> int:
     at = None
     if "--at" in args:
         i = args.index("--at")
-        parts = args[i + 1].split(",")
+        parts = args[i + 1].split(",") if i + 1 < len(args) else []
         del args[i:i + 2]
-        if len(parts) != 4:
+        try:
+            at = (int(parts[0]), int(parts[1]), int(parts[2]), parts[3])
+        except (IndexError, ValueError):
+            at = None
+        if at is None or len(parts) != 4:
             raise SystemExit("--at takes X,Y,Z,FACING, e.g. --at 6,76,-68,south")
-        at = (int(parts[0]), int(parts[1]), int(parts[2]), parts[3])
     opts = {"--distance": 3, "--up": 0}
     for flag in opts:
         if flag in args:
